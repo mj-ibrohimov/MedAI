@@ -2,6 +2,11 @@
 
 An advanced AI-powered medical assistant that provides interactive symptom triage, location-based healthcare services, and AI-generated medical content using the Sonar API (Perplexity) for intelligent medical reasoning.
 
+### Chatbot Previews
+- ![homepage](views/homepage.png)
+- ![chatbot](views/chatbot.png)
+- ![map](views/map.png)
+
 ## 🚀 Key Features
 
 ### 🔬 **Advanced Medical Triage System**
