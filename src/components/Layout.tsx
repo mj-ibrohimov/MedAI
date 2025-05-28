@@ -15,9 +15,9 @@ const Layout: React.FC<LayoutProps> = ({ header, main, footer }) => {
 
       {/* Main Content */}
       <div className="flex flex-col flex-1 h-full overflow-hidden">
-        {/* Header */}
+        {/* Header - Allow scrolling when content expands - Much larger when expanded */}
         {header && (
-          <header className="flex-shrink-0 p-3 glass backdrop-blur-lg z-10 border-b border-white/10">
+          <header className="flex-shrink-0 max-h-[70vh] overflow-y-auto p-3 glass backdrop-blur-lg z-20 border-b border-white/10 custom-scrollbar">
             {header}
           </header>
         )}
@@ -29,7 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ header, main, footer }) => {
 
         {/* Footer - Only shown when provided (articles for new chats) */}
         {footer && (
-          <footer className="flex-shrink-0 h-64 overflow-y-auto p-4 glass backdrop-blur-lg border-t border-white/10 bg-black/20 animate-fade-in">
+          <footer className="flex-shrink-0 h-64 overflow-y-auto p-4 glass backdrop-blur-lg border-t border-white/10 bg-black/20 animate-fade-in custom-scrollbar">
             {footer}
           </footer>
         )}

@@ -4,7 +4,10 @@ export interface Message {
   text: string;
   isUser: boolean;
   timestamp: string;
+  chatId?: string;
   error?: boolean;
+  questionType?: string;
+  options?: string[];
 }
 
 // Article type for health articles feed

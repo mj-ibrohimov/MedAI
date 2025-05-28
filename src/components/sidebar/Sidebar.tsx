@@ -1,16 +1,16 @@
 import React from 'react';
-import { MessageSquare, RefreshCw, BookOpen } from 'lucide-react';
+import { MessageSquare, Plus, BookOpen } from 'lucide-react';
 import { useChat } from '../../context/ChatContext';
 import ChatHistory from './ChatHistory';
 
 const Sidebar: React.FC = () => {
-  const { clearChat, hasStartedChat } = useChat();
+  const { startNewChat, hasStartedChat } = useChat();
 
   const handleNewChat = () => {
-    if (hasStartedChat && window.confirm('Are you sure you want to start a new chat? This will clear your current conversation.')) {
-      clearChat();
+    if (hasStartedChat && window.confirm('Are you sure you want to start a new chat? This will save your current conversation and create a new one.')) {
+      startNewChat();
     } else if (!hasStartedChat) {
-      clearChat();
+      startNewChat();
     }
   };
 
@@ -21,14 +21,18 @@ const Sidebar: React.FC = () => {
         <div className="flex items-center justify-between p-6 border-b border-white/10">
           <h2 className="text-lg font-semibold flex items-center text-textPrimary">
             <MessageSquare className="w-5 h-5 mr-2 text-primary" />
-            Chat History
+            AI Medical Assistant
           </h2>
+        </div>
+
+        {/* New Chat Button */}
+        <div className="p-6 border-b border-white/10">
           <button 
             onClick={handleNewChat}
-            className="p-2 text-textSecondary hover:text-primary rounded-xl hover:bg-primary/10 transition-all duration-200 btn-interactive"
-            title="New Chat"
+            className="w-full p-4 bg-gradient-aurora text-white rounded-xl hover:shadow-xl transition-all duration-200 btn-interactive flex items-center justify-center space-x-2 group"
           >
-            <RefreshCw className="w-5 h-5" />
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+            <span className="font-medium">New Medical Consultation</span>
           </button>
         </div>
 
@@ -43,8 +47,14 @@ const Sidebar: React.FC = () => {
         )}
 
         {/* Chat History */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <ChatHistory />
+        <div className="flex-1 overflow-y-auto">
+          <div className="p-6">
+            <h3 className="text-sm font-medium text-textSecondary mb-4 flex items-center">
+              <MessageSquare className="w-4 h-4 mr-2" />
+              Recent Conversations
+            </h3>
+            <ChatHistory />
+          </div>
         </div>
       </div>
     </aside>
