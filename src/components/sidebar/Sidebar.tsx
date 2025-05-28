@@ -1,13 +1,15 @@
 import React from 'react';
-import { MessageSquare, RefreshCw } from 'lucide-react';
+import { MessageSquare, RefreshCw, BookOpen } from 'lucide-react';
 import { useChat } from '../../context/ChatContext';
 import ChatHistory from './ChatHistory';
 
 const Sidebar: React.FC = () => {
-  const { clearChat } = useChat();
+  const { clearChat, hasStartedChat } = useChat();
 
   const handleNewChat = () => {
-    if (window.confirm('Are you sure you want to start a new chat? This will clear your current conversation.')) {
+    if (hasStartedChat && window.confirm('Are you sure you want to start a new chat? This will clear your current conversation.')) {
+      clearChat();
+    } else if (!hasStartedChat) {
       clearChat();
     }
   };
@@ -29,6 +31,16 @@ const Sidebar: React.FC = () => {
             <RefreshCw className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Status Indicator */}
+        {!hasStartedChat && (
+          <div className="px-6 py-3 border-b border-white/10 animate-fade-in">
+            <div className="flex items-center text-sm text-textMuted">
+              <BookOpen className="w-4 h-4 mr-2 text-accent" />
+              <span>Articles visible • Full chat mode on first message</span>
+            </div>
+          </div>
+        )}
 
         {/* Chat History */}
         <div className="flex-1 overflow-y-auto p-6">

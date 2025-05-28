@@ -23,13 +23,13 @@ const Layout: React.FC<LayoutProps> = ({ header, main, footer }) => {
         )}
 
         {/* Main Content Area - Takes most space */}
-        <main className="flex-1 overflow-hidden p-4 bg-transparent min-h-0">
+        <main className={`flex-1 overflow-hidden p-4 bg-transparent min-h-0 ${footer ? '' : 'pb-6'}`}>
           {main}
         </main>
 
-        {/* Footer - Fixed small height for articles */}
+        {/* Footer - Only shown when provided (articles for new chats) */}
         {footer && (
-          <footer className="flex-shrink-0 h-64 overflow-y-auto p-4 glass backdrop-blur-lg border-t border-white/10 bg-black/20">
+          <footer className="flex-shrink-0 h-64 overflow-y-auto p-4 glass backdrop-blur-lg border-t border-white/10 bg-black/20 animate-fade-in">
             {footer}
           </footer>
         )}

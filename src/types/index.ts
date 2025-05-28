@@ -37,4 +37,20 @@ export interface Place {
     height: number;
   }[];
   distanceMeters?: number;
+  travelTimes?: {
+    walking: {
+      distance: string;
+      distanceMeters: number | null;
+      duration: string;
+      durationSeconds: number | null;
+      status: string;
+    };
+    driving: {
+      distance: string;
+      distanceMeters: number | null;
+      duration: string;
+      durationSeconds: number | null;
+      status: string;
+    };
+  } | null;
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Star, ExternalLink, Clock, Navigation } from 'lucide-react';
+import { MapPin, Star, ExternalLink, Clock, Navigation, Car, User } from 'lucide-react';
 import { Place } from '../../types';
 
 interface LocationResultsProps {
@@ -19,6 +19,28 @@ const LocationResults: React.FC<LocationResultsProps> = ({ places, loading, erro
     }
   };
 
+  const formatTravelTime = (place: Place) => {
+    if (!place.travelTimes) {
+      // Fallback to calculated walking time
+      const walkingTime = calculateWalkingTime(place.distanceMeters);
+      return {
+        walking: walkingTime,
+        driving: 'Unknown',
+        walkingDistance: formatDistance(place.distanceMeters),
+        drivingDistance: 'Unknown'
+      };
+    }
+
+    const { walking, driving } = place.travelTimes;
+    
+    return {
+      walking: walking.status === 'OK' ? walking.duration : 'Unknown',
+      driving: driving.status === 'OK' ? driving.duration : 'Unknown',
+      walkingDistance: walking.status === 'OK' ? walking.distance : formatDistance(place.distanceMeters),
+      drivingDistance: driving.status === 'OK' ? driving.distance : 'Unknown'
+    };
+  };
+
   const calculateWalkingTime = (meters: number | undefined) => {
     if (!meters) return 'Unknown time';
     
@@ -27,20 +49,20 @@ const LocationResults: React.FC<LocationResultsProps> = ({ places, loading, erro
     const timeSeconds = meters / walkingSpeedMps;
     
     if (timeSeconds < 60) {
-      return '< 1 min walk';
+      return '< 1 min';
     } else if (timeSeconds < 3600) {
       const minutes = Math.round(timeSeconds / 60);
-      return `${minutes} min walk`;
+      return `${minutes} min`;
     } else {
       const hours = Math.floor(timeSeconds / 3600);
       const minutes = Math.round((timeSeconds % 3600) / 60);
-      return `${hours}h ${minutes}m walk`;
+      return `${hours}h ${minutes}m`;
     }
   };
 
-  const getDirectionsUrl = (place: Place) => {
+  const getDirectionsUrl = (place: Place, mode: 'walking' | 'driving' = 'walking') => {
     const { lat, lng } = place.location;
-    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=${mode}`;
   };
 
   if (loading) {
@@ -99,15 +121,28 @@ const LocationResults: React.FC<LocationResultsProps> = ({ places, loading, erro
           
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Navigation className="w-4 h-4 text-primary" />
-                <div className="text-sm">
-                  <span className="font-semibold text-accent">
-                    {formatDistance(place.distanceMeters)}
-                  </span>
-                  <span className="text-textMuted ml-1">
-                    ({calculateWalkingTime(place.distanceMeters)})
-                  </span>
+              <div className="flex flex-col space-y-2 bg-white/5 backdrop-blur-sm rounded-lg px-3 py-2 min-w-0">
+                <div className="flex items-center space-x-2">
+                  <User className="w-4 h-4 text-blue-400 shrink-0" />
+                  <div className="text-sm min-w-0">
+                    <span className="font-semibold text-accent">
+                      {formatTravelTime(place).walkingDistance}
+                    </span>
+                    <span className="text-textMuted ml-1">
+                      · {formatTravelTime(place).walking} walk
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Car className="w-4 h-4 text-green-400 shrink-0" />
+                  <div className="text-sm min-w-0">
+                    <span className="font-semibold text-accent">
+                      {formatTravelTime(place).drivingDistance}
+                    </span>
+                    <span className="text-textMuted ml-1">
+                      · {formatTravelTime(place).driving} drive
+                    </span>
+                  </div>
                 </div>
               </div>
               
@@ -123,15 +158,26 @@ const LocationResults: React.FC<LocationResultsProps> = ({ places, loading, erro
               )}
             </div>
             
-            <a
-              href={getDirectionsUrl(place)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-1 px-3 py-2 bg-gradient-aurora text-white rounded-xl hover:scale-105 transition-all duration-200 shadow-lg text-sm font-medium btn-interactive"
-            >
-              <span>Walking Directions</span>
-              <ExternalLink className="w-3 h-3" />
-            </a>
+            <div className="flex items-center space-x-2">
+              <a
+                href={getDirectionsUrl(place, 'walking')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-1 px-3 py-2 bg-blue-500/20 text-blue-300 rounded-xl hover:scale-105 transition-all duration-200 shadow-lg text-sm font-medium btn-interactive border border-blue-500/30"
+              >
+                <User className="w-3 h-3" />
+                <span>Walk</span>
+              </a>
+              <a
+                href={getDirectionsUrl(place, 'driving')}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center space-x-1 px-3 py-2 bg-green-500/20 text-green-300 rounded-xl hover:scale-105 transition-all duration-200 shadow-lg text-sm font-medium btn-interactive border border-green-500/30"
+              >
+                <Car className="w-3 h-3" />
+                <span>Drive</span>
+              </a>
+            </div>
           </div>
         </div>
       ))}

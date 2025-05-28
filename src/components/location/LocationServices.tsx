@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Search, Clock, Star, Navigation, ExternalLink, X, Loader2 } from 'lucide-react';
+import { MapPin, Search, Clock, Star, Navigation, ExternalLink, X, Loader2, Car, User } from 'lucide-react';
 import { Place } from '../../types';
 
 const LocationServices: React.FC = () => {
@@ -21,8 +21,30 @@ const LocationServices: React.FC = () => {
     return meters < 1000 ? `${meters.toFixed(0)}m` : `${(meters / 1000).toFixed(1)}km`;
   };
 
+  const formatTravelTime = (place: Place) => {
+    if (!place.travelTimes) {
+      // Fallback to calculated walking time
+      const walkingTime = calculateWalkingTime(place.distanceMeters);
+      return {
+        walking: walkingTime,
+        driving: 'Unknown',
+        walkingDistance: formatDistance(place.distanceMeters),
+        drivingDistance: 'Unknown'
+      };
+    }
+
+    const { walking, driving } = place.travelTimes;
+    
+    return {
+      walking: walking.status === 'OK' ? walking.duration : 'Unknown',
+      driving: driving.status === 'OK' ? driving.duration : 'Unknown',
+      walkingDistance: walking.status === 'OK' ? walking.distance : formatDistance(place.distanceMeters),
+      drivingDistance: driving.status === 'OK' ? driving.distance : 'Unknown'
+    };
+  };
+
   const calculateWalkingTime = (meters: number | undefined) => {
-    if (!meters) return 'Unknown time';
+    if (!meters) return 'Unknown';
     const walkingSpeedMps = 1.4;
     const timeSeconds = meters / walkingSpeedMps;
     
@@ -34,9 +56,9 @@ const LocationServices: React.FC = () => {
     return `${hours}h ${minutes}m`;
   };
 
-  const getDirectionsUrl = (place: Place) => {
+  const getDirectionsUrl = (place: Place, mode: 'walking' | 'driving' = 'walking') => {
     const { lat, lng } = place.location;
-    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=walking`;
+    return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=${mode}`;
   };
 
   const fetchNearbyPlaces = () => {
@@ -248,15 +270,28 @@ const LocationServices: React.FC = () => {
                       
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
-                          <div className="flex items-center space-x-2 bg-glass rounded-lg px-3 py-2">
-                            <Navigation className="w-4 h-4 text-accent" />
-                            <div className="text-sm">
-                              <span className="font-semibold text-textPrimary">
-                                {formatDistance(place.distanceMeters)}
-                              </span>
-                              <span className="text-textMuted ml-1">
-                                · {calculateWalkingTime(place.distanceMeters)} walk
-                              </span>
+                          <div className="flex flex-col space-y-2 bg-glass rounded-lg px-3 py-2 min-w-0">
+                            <div className="flex items-center space-x-2">
+                              <User className="w-4 h-4 text-blue-400 shrink-0" />
+                              <div className="text-sm min-w-0">
+                                <span className="font-semibold text-textPrimary">
+                                  {formatTravelTime(place).walkingDistance}
+                                </span>
+                                <span className="text-textMuted ml-1">
+                                  · {formatTravelTime(place).walking} walk
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Car className="w-4 h-4 text-green-400 shrink-0" />
+                              <div className="text-sm min-w-0">
+                                <span className="font-semibold text-textPrimary">
+                                  {formatTravelTime(place).drivingDistance}
+                                </span>
+                                <span className="text-textMuted ml-1">
+                                  · {formatTravelTime(place).driving} drive
+                                </span>
+                              </div>
                             </div>
                           </div>
                           
@@ -272,15 +307,26 @@ const LocationServices: React.FC = () => {
                           )}
                         </div>
                         
-                        <a
-                          href={getDirectionsUrl(place)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center space-x-2 px-4 py-2 bg-gradient-aurora text-white rounded-xl hover:scale-105 transition-all duration-200 shadow-lg text-sm font-medium btn-interactive"
-                        >
-                          <span>Get Directions</span>
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
+                        <div className="flex items-center space-x-2">
+                          <a
+                            href={getDirectionsUrl(place, 'walking')}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-1 px-3 py-2 bg-blue-500/20 text-blue-300 rounded-xl hover:scale-105 transition-all duration-200 shadow-lg text-sm font-medium btn-interactive border border-blue-500/30"
+                          >
+                            <User className="w-3 h-3" />
+                            <span>Walk</span>
+                          </a>
+                          <a
+                            href={getDirectionsUrl(place, 'driving')}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-1 px-3 py-2 bg-green-500/20 text-green-300 rounded-xl hover:scale-105 transition-all duration-200 shadow-lg text-sm font-medium btn-interactive border border-green-500/30"
+                          >
+                            <Car className="w-3 h-3" />
+                            <span>Drive</span>
+                          </a>
+                        </div>
                       </div>
                     </div>
                   ))}

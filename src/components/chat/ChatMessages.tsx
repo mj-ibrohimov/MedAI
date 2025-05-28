@@ -10,7 +10,7 @@ interface ChatMessagesProps {
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({ messages }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { isLoading } = useChat();
+  const { isLoading, hasStartedChat } = useChat();
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -23,6 +23,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ messages }) => {
         <div className="text-center">
           <Sparkles className="w-16 h-16 mx-auto mb-4 text-primary animate-pulse" />
           <p className="text-lg">Start a conversation by typing a message</p>
+          {!hasStartedChat && (
+            <p className="text-sm mt-2 opacity-70">Browse health articles below while you think</p>
+          )}
         </div>
       </div>
     );

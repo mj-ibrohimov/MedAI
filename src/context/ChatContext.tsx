@@ -4,6 +4,7 @@ import { Message } from '../types';
 interface ChatContextType {
   messages: Message[];
   isLoading: boolean;
+  hasStartedChat: boolean;
   sendMessage: (text: string) => Promise<void>;
   clearChat: () => void;
 }
@@ -25,13 +26,18 @@ interface ChatProviderProps {
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasStartedChat, setHasStartedChat] = useState(false);
 
   // Load messages from localStorage on initial render
   useEffect(() => {
     const savedMessages = localStorage.getItem('chatMessages');
     if (savedMessages) {
       try {
-        setMessages(JSON.parse(savedMessages));
+        const parsedMessages = JSON.parse(savedMessages);
+        setMessages(parsedMessages);
+        // Check if there are any user messages (not just the welcome message)
+        const userMessages = parsedMessages.filter((msg: Message) => msg.isUser);
+        setHasStartedChat(userMessages.length > 0);
       } catch (error) {
         console.error('Error parsing saved messages:', error);
         localStorage.removeItem('chatMessages');
@@ -55,10 +61,16 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       timestamp: new Date().toISOString()
     };
     setMessages([welcomeMessage]);
+    setHasStartedChat(false);
   };
 
   const sendMessage = async (text: string) => {
     if (!text.trim()) return;
+
+    // Mark that the user has started chatting
+    if (!hasStartedChat) {
+      setHasStartedChat(true);
+    }
 
     // Create user message
     const userMessage: Message = {
@@ -126,6 +138,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const value = {
     messages,
     isLoading,
+    hasStartedChat,
     sendMessage,
     clearChat
   };
