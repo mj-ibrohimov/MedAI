@@ -123,7 +123,10 @@ const ArticlesFeed: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
           {articles.map((article, index) => (
             <div key={article.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-              <ArticleCard article={article} isCompact={true} />
+              <ArticleCard 
+                article={article} 
+                isCompact={true} 
+              />
             </div>
           ))}
         </div>

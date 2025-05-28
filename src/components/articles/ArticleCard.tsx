@@ -41,10 +41,10 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, isCompact = false })
         )}
         
         <div className="flex items-center justify-between">
-          <button className={`text-primary hover:text-accent flex items-center font-medium transition-all duration-200 hover:scale-105 ${isCompact ? 'text-xs' : 'text-sm'}`}>
-            <span className="mr-1">Read</span>
-            <ExternalLink className={`${isCompact ? 'w-3 h-3' : 'w-4 h-4'}`} />
-          </button>
+          <span className={`text-textMuted flex items-center font-medium ${isCompact ? 'text-xs' : 'text-sm'}`}>
+            <ExternalLink className={`mr-1 ${isCompact ? 'w-3 h-3' : 'w-4 h-4'}`} />
+            Health Article
+          </span>
           
           <div className={`bg-gradient-aurora rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-300 ${isCompact ? 'w-6 h-0.5' : 'w-8 h-1'}`} />
         </div>
